@@ -33,7 +33,7 @@ internal class FPSStatusBarViewController: UIViewController, FPSCounterDelegate 
 
     private func commonInit() {
         NotificationCenter.default.addObserver(self,
-            selector: #selector(FPSStatusBarViewController.updateStatusBarFrame(_:)),
+                                               selector: #selector(updateStatusBarFrame),
             name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation,
             object: nil
         )
@@ -48,8 +48,10 @@ internal class FPSStatusBarViewController: UIViewController, FPSCounterDelegate 
 
     override func loadView() {
         self.view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 100.0, height: 100.0))
-
-        self.label.frame = self.view.bounds.insetBy(dx: 10.0, dy: 0.0)
+        let rect : CGRect = self.view.bounds
+        self.label.frame = rect.insetBy(dx: 10.0, dy: 0.0);
+        
+        
         self.label.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
         self.label.font = UIFont.boldSystemFont(ofSize: 10.0)
         self.view.addSubview(self.label)
@@ -57,7 +59,7 @@ internal class FPSStatusBarViewController: UIViewController, FPSCounterDelegate 
         self.fpsCounter.delegate = self
     }
 
-    func updateStatusBarFrame(_ notification: Notification) {
+    @objc func updateStatusBarFrame(notification: NSNotification) {
         let application = notification.object as? UIApplication
         let frame = CGRect(x: 0.0, y: 0.0, width: application?.keyWindow?.bounds.width ?? 0.0, height: 20.0)
 
@@ -67,7 +69,7 @@ internal class FPSStatusBarViewController: UIViewController, FPSCounterDelegate 
 
     // MARK: - FPSCounterDelegate
 
-    func fpsCounter(_ counter: FPSCounter, didUpdateFramesPerSecond fps: Int) {
+    func fpsCounter(counter: FPSCounter, didUpdateFramesPerSecond fps: Int) {
         let ms = 1000 / max(fps, 1)
         self.label.text = "\(fps) FPS (\(ms) milliseconds per frame)"
 
@@ -109,16 +111,18 @@ public extension FPSCounter {
     ///   - runloop:     The `NSRunLoop` to use when tracking FPS or `nil` (then it uses the main run loop)
     ///   - mode:        The run loop mode to use when tracking. If `nil` it uses `NSRunLoopCommonModes`
     ///
-    public class func showInStatusBar(_ application: UIApplication, runloop: RunLoop? = nil, mode: RunLoopMode? = nil) {
+    public class func showInStatusBar(application: UIApplication, runloop: RunLoop? = nil, mode: RunLoopMode? = nil) {
         let window = FPSStatusBarViewController.statusBarWindow
         window.frame = application.statusBarFrame
         window.isHidden = false
 
         if let controller = window.rootViewController as? FPSStatusBarViewController {
-            controller.fpsCounter.startTracking(
-                inRunLoop: runloop ?? RunLoop.main,
-                mode: mode ?? RunLoopMode.commonModes
-            )
+            controller.fpsCounter.startTracking(inRunLoop: runloop ?? .main, mode: mode ?? .commonModes)
+//            controller.fpsCounter.startTracking(inRunLoop: runloop ?? .mainRunLoop(), mode: mode ?? .commonModes)
+////            controller.fpsCounter.startTracking(
+////                inRunLoop: runloop ?? .mainRunLoop(),
+////                mode: mode ?? .commonModes
+////            )
         }
     }
 }
