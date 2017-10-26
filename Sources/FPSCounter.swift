@@ -61,8 +61,6 @@ public class FPSCounter: NSObject {
     ///
     public override init() {
         self.displayLinkDelegate = DisplayLinkDelegate()
-//        self.displayLink = CADisplayLink(target: self.displayLinkDelegate, selector: "updateFromDisplayLink:")
-//        self.displayLink = CADisplayLink(target: self.displayLinkDelegate, selector: #selector(updateFromDisplayLink:))
         self.displayLink = CADisplayLink(
         target: self.displayLinkDelegate,
         selector: #selector(DisplayLinkDelegate.updateFromDisplayLink(_:))
